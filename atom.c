@@ -37,16 +37,24 @@ int atom_parse(atom *atom)
       return atom_parse_mvhd(atom);
     case ATOM_TYPE_META:
       return atom_parse_meta(atom);
+    case ATOM_TYPE_STYP:
+      return atom_parse_styp(atom);
+    case ATOM_TYPE_SIDX:
+      return atom_parse_sidx(atom);
+    case ATOM_TYPE_MDAT:
+      return atom_parse_mdat(atom);
     case ATOM_TYPE_MOOV:
     case ATOM_TYPE_TRAK:
+    case ATOM_TYPE_TRAF:
     case ATOM_TYPE_MDIA:
     case ATOM_TYPE_UDTA:
     case ATOM_TYPE_MINF:
     case ATOM_TYPE_STBL:
+    case ATOM_TYPE_MOOF:
     case ATOM_TYPE_ILST:
       return atoms_parse(&atom->atoms, (segment[]){{.base = atom->data.base + atom->header_size, .end = atom->data.end}});
+    case ATOM_TYPE_TRUN:
     case ATOM_TYPE_FREE:
-    case ATOM_TYPE_MDAT:
       default:
       break;
     }
@@ -86,6 +94,58 @@ int atom_parse_ftyp(atom *atom)
   for (label = atom->data.base + atom->header_size; label < atom->data.end; label += 4)
     (void) printf("%c%.*s", label == atom->data.base  + atom->header_size ? ' ' : ',', 4, label);
   (void) printf("\n");
+  return 0;
+}
+
+int atom_parse_styp(atom *atom)
+{
+  char *label;
+
+  (void) printf("%*s", atom->atoms.depth * 2, "");
+  (void) printf("- labels");
+  for (label = atom->data.base + atom->header_size; label < atom->data.end; label += 4)
+    (void) printf("%c%.*s", label == atom->data.base  + atom->header_size ? ' ' : ',', 4, label);
+  (void) printf("\n");
+  return 0;
+}
+
+int atom_parse_mdat(atom *atom)
+{
+  return 0;
+}
+
+typedef struct atom_sidx atom_sidx;
+struct __attribute__((__packed__)) atom_sidx
+{
+  uint8_t  v;
+  uint8_t  x[3];
+  uint32_t id;
+  uint32_t timescale;
+  uint64_t ept;
+  uint64_t offset;
+  uint16_t reserved;
+  uint16_t ref;
+  uint32_t type:1;
+  uint32_t size:31;
+  uint32_t duration;
+  uint32_t sap_type:3;
+  uint32_t sap_delta_time:28;
+};
+
+int atom_parse_sidx(atom *atom)
+{
+  atom_sidx *sidx;
+
+  sidx = (atom_sidx *) (atom->data.base + atom->header_size);
+
+  (void) printf("%*s", atom->atoms.depth * 2, "");
+  (void) printf("- %u %u %u %lu %lu %u %u\n", sidx->v, be32toh(sidx->id),  be32toh(sidx->timescale), be64toh(sidx->ept), be64toh(sidx->offset),
+                be16toh(sidx->reserved), be16toh(sidx->ref));
+  if (be16toh(sidx->ref) != 1)
+    return -1;
+  (void) printf("%*s", atom->atoms.depth * 2, "");
+  (void) printf("- %u %u %u %u %u\n", sidx->type, sidx->size, be32toh(sidx->duration), sidx->sap_type, sidx->sap_delta_time);
+
   return 0;
 }
 

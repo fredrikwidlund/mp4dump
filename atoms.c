@@ -11,7 +11,7 @@
 int atoms_init(atoms *atoms, int depth)
 {
   atoms->depth = depth;
-  vector_init(&atoms->list, sizeof(atom *));
+  vector_construct(&atoms->list, sizeof(atom *));
 
   return 0;
 }

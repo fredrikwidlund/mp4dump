@@ -12,10 +12,15 @@
 enum
 {
   ATOM_TYPE_FTYP = atom_type('f', 't', 'y', 'p'),
+  ATOM_TYPE_STYP = atom_type('s', 't', 'y', 'p'),
+  ATOM_TYPE_SIDX = atom_type('s', 'i', 'd', 'x'),
   ATOM_TYPE_FREE = atom_type('f', 'r', 'e', 'e'),
   ATOM_TYPE_MDAT = atom_type('m', 'd', 'a', 't'),
   ATOM_TYPE_MOOV = atom_type('m', 'o', 'o', 'v'),
+  ATOM_TYPE_MOOF = atom_type('m', 'o', 'o', 'f'),
   ATOM_TYPE_TRAK = atom_type('t', 'r', 'a', 'k'),
+  ATOM_TYPE_TRAF = atom_type('t', 'r', 'a', 'f'),
+  ATOM_TYPE_TRUN = atom_type('t', 'r', 'u', 'n'),
   ATOM_TYPE_MVHD = atom_type('m', 'v', 'h', 'd'),
   ATOM_TYPE_MDIA = atom_type('m', 'd', 'i', 'a'),
   ATOM_TYPE_UDTA = atom_type('u', 'd', 't', 'a'),
@@ -85,7 +90,10 @@ void  atom_init(atom *, segment *, int);
 int   atom_parse(atom *);
 int   atom_parse_header(atom *);
 int   atom_parse_ftyp(atom *);
+int   atom_parse_styp(atom *);
+int   atom_parse_sidx(atom *);
 int   atom_parse_mvhd(atom *);
 int   atom_parse_meta(atom *);
+int   atom_parse_mdat(atom *);
 
 #endif /* ATOM_H_INCLUDED */
